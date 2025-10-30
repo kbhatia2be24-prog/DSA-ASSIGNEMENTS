@@ -1,3 +1,5 @@
+Q-1)
+
 #include <iostream>
 using namespace std;
 
@@ -227,7 +229,7 @@ int main() {
                 break;
 
             case 5:
-                cout << "Exiting program. Goodbye!\n";
+                cout << "Exiting program\n";
                 return 0;
 
             default:
@@ -235,3 +237,334 @@ int main() {
         }
     }
 }
+
+Q-2)
+
+#include <iostream>
+using namespace std;
+
+// Node structure
+struct Node {
+    int data;
+    Node* next;
+};
+
+// Function to insert node at end
+void insertAtEnd(Node*& head, int value) {
+    Node* newNode = new Node();
+    newNode->data = value;
+
+    if (head == NULL) {
+        head = newNode;
+        newNode->next = head; // points to itself (circular)
+        return;
+    }
+
+    Node* temp = head;
+    while (temp->next != head)  // go to last node
+        temp = temp->next;
+
+    temp->next = newNode;
+    newNode->next = head; // complete the circle
+}
+
+// Function to display all node values (repeat head at end)
+void displayCircularList(Node* head) {
+    if (head == NULL) {
+        cout << "List is empty.\n";
+        return;
+    }
+
+    Node* temp = head;
+    cout << "Circular Linked List: ";
+
+    // Traverse list once
+    do {
+        cout << temp->data << " ";
+        temp = temp->next;
+    } while (temp != head);
+
+    // Repeat the head node’s value at the end
+    cout << head->data << endl;
+}
+
+// Main function
+int main() {
+    Node* head = NULL;
+    int n, value;
+
+    cout << "Enter number of nodes: ";
+    cin >> n;
+
+    cout << "Enter " << n << " values:\n";
+    for (int i = 0; i < n; i++) {
+        cin >> value;
+        insertAtEnd(head, value);
+    }
+
+    // Display the list
+    displayCircularList(head);
+
+    return 0;
+}
+
+
+Q-3)
+
+#include <iostream>
+using namespace std;
+
+// ======================== DOUBLY LINKED LIST ========================
+struct DoublyNode {
+    int data;
+    DoublyNode* prev;
+    DoublyNode* next;
+};
+
+// Function to insert node at the end of doubly linked list
+void insertDoubly(DoublyNode*& head, int value) {
+    DoublyNode* newNode = new DoublyNode();
+    newNode->data = value;
+    newNode->next = NULL;
+    newNode->prev = NULL;
+
+    if (head == NULL) {
+        head = newNode;
+        return;
+    }
+
+    DoublyNode* temp = head;
+    while (temp->next != NULL)
+        temp = temp->next;
+
+    temp->next = newNode;
+    newNode->prev = temp;
+}
+
+// Function to find size of doubly linked list
+int sizeDoubly(DoublyNode* head) {
+    int count = 0;
+    DoublyNode* temp = head;
+    while (temp != NULL) {
+        count++;
+        temp = temp->next;
+    }
+    return count;
+}
+
+// ======================== CIRCULAR LINKED LIST ========================
+struct CircularNode {
+    int data;
+    CircularNode* next;
+};
+
+// Function to insert node at the end of circular linked list
+void insertCircular(CircularNode*& head, int value) {
+    CircularNode* newNode = new CircularNode();
+    newNode->data = value;
+
+    if (head == NULL) {
+        head = newNode;
+        newNode->next = head; // circular link
+        return;
+    }
+
+    CircularNode* temp = head;
+    while (temp->next != head)
+        temp = temp->next;
+
+    temp->next = newNode;
+    newNode->next = head;
+}
+
+// Function to find size of circular linked list
+int sizeCircular(CircularNode* head) {
+    if (head == NULL) return 0;
+
+    int count = 0;
+    CircularNode* temp = head;
+    do {
+        count++;
+        temp = temp->next;
+    } while (temp != head);
+
+    return count;
+}
+
+// ======================== MAIN FUNCTION ========================
+int main() {
+    // Doubly Linked List
+    DoublyNode* dHead = NULL;
+    insertDoubly(dHead, 10);
+    insertDoubly(dHead, 20);
+    insertDoubly(dHead, 30);
+    cout << "Size of Doubly Linked List: " << sizeDoubly(dHead) << endl;
+
+    // Circular Linked List
+    CircularNode* cHead = NULL;
+    insertCircular(cHead, 5);
+    insertCircular(cHead, 15);
+    insertCircular(cHead, 25);
+    insertCircular(cHead, 35);
+    cout << "Size of Circular Linked List: " << sizeCircular(cHead) << endl;
+
+    return 0;
+}
+
+Q-4)
+
+#include <iostream>
+using namespace std;
+
+// Node structure for doubly linked list
+struct Node {
+    char data;
+    Node* prev;
+    Node* next;
+};
+
+// Function to insert node at the end
+void insertEnd(Node*& head, char value) {
+    Node* newNode = new Node();
+    newNode->data = value;
+    newNode->next = NULL;
+    newNode->prev = NULL;
+
+    if (head == NULL) {
+        head = newNode;
+        return;
+    }
+
+    Node* temp = head;
+    while (temp->next != NULL)
+        temp = temp->next;
+
+    temp->next = newNode;
+    newNode->prev = temp;
+}
+
+// Function to check if doubly linked list is palindrome
+bool isPalindrome(Node* head) {
+    if (head == NULL) return true;
+
+    Node* start = head;
+    Node* end = head;
+
+    // Move 'end' to the last node
+    while (end->next != NULL)
+        end = end->next;
+
+    // Compare from start and end
+    while (start != end && start->prev != end) {
+        if (start->data != end->data)
+            return false;
+        start = start->next;
+        end = end->prev;
+    }
+
+    return true;
+}
+
+// Function to display the doubly linked list
+void display(Node* head) {
+    Node* temp = head;
+    while (temp != NULL) {
+        cout << temp->data << " ";
+        temp = temp->next;
+    }
+    cout << endl;
+}
+
+// Main function
+int main() {
+    Node* head = NULL;
+
+    // Example input: "r a d a r"
+    char arr[] = {'r', 'a', 'd', 'a', 'r'};
+    int n = sizeof(arr)/sizeof(arr[0]);
+
+    for (int i = 0; i < n; i++)
+        insertEnd(head, arr[i]);
+
+    cout << "Doubly Linked List: ";
+    display(head);
+
+    if (isPalindrome(head))
+        cout << "The list is a palindrome." << endl;
+    else
+        cout << "The list is NOT a palindrome." << endl;
+
+    return 0;
+}
+
+
+Q-5)
+
+#include <iostream>
+using namespace std;
+
+// Node structure
+struct Node {
+    int data;
+    Node* next;
+};
+
+// Function to insert node at the end
+void insertEnd(Node*& head, int value) {
+    Node* newNode = new Node();
+    newNode->data = value;
+    newNode->next = NULL;
+
+    if (head == NULL) {
+        head = newNode;
+        return;
+    }
+
+    Node* temp = head;
+    while (temp->next != NULL)
+        temp = temp->next;
+
+    temp->next = newNode;
+}
+
+// Function to check if linked list is circular
+bool isCircular(Node* head) {
+    if (head == NULL)
+        return true; // Empty list can be considered circular
+
+    Node* temp = head->next;
+    while (temp != NULL && temp != head) {
+        temp = temp->next;
+    }
+
+    return (temp == head);
+}
+
+// Main function
+int main() {
+    Node* head = NULL;
+
+    // Create normal linked list: 10 -> 20 -> 30 -> NULL
+    insertEnd(head, 10);
+    insertEnd(head, 20);
+    insertEnd(head, 30);
+
+    if (isCircular(head))
+        cout << "The linked list is circular." << endl;
+    else
+        cout << "The linked list is NOT circular." << endl;
+
+    // Make it circular for testing: 30 -> 10
+    Node* temp = head;
+    while (temp->next != NULL)
+        temp = temp->next;
+    temp->next = head; // make circular
+
+    if (isCircular(head))
+        cout << "After linking last to head, the list is circular." << endl;
+    else
+        cout << "The list is still NOT circular." << endl;
+
+    return 0;
+}
+
