@@ -1,0 +1,237 @@
+#include <iostream>
+using namespace std;
+
+// Node structure for circular doubly linked list
+struct Node {
+    int data;
+    Node* prev;
+    Node* next;
+};
+
+// Head pointer (start of the list)
+Node* head = NULL;
+
+// Function to display the list
+void displayList() {
+    if (head == NULL) {
+        cout << "List is empty.\n";
+        return;
+    }
+
+    Node* temp = head;
+    cout << "Circular Doubly Linked List: ";
+    do {
+        cout << temp->data << " ";
+        temp = temp->next;
+    } while (temp != head);
+    cout << endl;
+}
+
+// Function to insert a new node
+void insertNode(int value, int positionType, int refValue = -1) {
+    Node* newNode = new Node();
+    newNode->data = value;
+    newNode->next = newNode->prev = NULL;
+
+    // If list is empty
+    if (head == NULL) {
+        newNode->next = newNode->prev = newNode;
+        head = newNode;
+        cout << "Inserted " << value << " as the first node.\n";
+        return;
+    }
+
+    // Insert at beginning
+    if (positionType == 1) {
+        Node* last = head->prev;
+        newNode->next = head;
+        newNode->prev = last;
+        last->next = newNode;
+        head->prev = newNode;
+        head = newNode;
+        cout << "Inserted " << value << " at the beginning.\n";
+    }
+
+    // Insert at end
+    else if (positionType == 2) {
+        Node* last = head->prev;
+        newNode->next = head;
+        newNode->prev = last;
+        last->next = newNode;
+        head->prev = newNode;
+        cout << "Inserted " << value << " at the end.\n";
+    }
+
+    // Insert before or after a specific node
+    else if (positionType == 3) {
+        Node* temp = head;
+        bool found = false;
+
+        do {
+            if (temp->data == refValue) {
+                found = true;
+                break;
+            }
+            temp = temp->next;
+        } while (temp != head);
+
+        if (!found) {
+            cout << "Value " << refValue << " not found in the list.\n";
+            delete newNode;
+            return;
+        }
+
+        int choice;
+        cout << "Insert 1) Before or 2) After " << refValue << "? ";
+        cin >> choice;
+
+        if (choice == 1) {
+            Node* prevNode = temp->prev;
+            newNode->next = temp;
+            newNode->prev = prevNode;
+            prevNode->next = newNode;
+            temp->prev = newNode;
+            if (temp == head)
+                head = newNode;
+            cout << "Inserted " << value << " before " << refValue << ".\n";
+        } else {
+            Node* nextNode = temp->next;
+            newNode->next = nextNode;
+            newNode->prev = temp;
+            temp->next = newNode;
+            nextNode->prev = newNode;
+            cout << "Inserted " << value << " after " << refValue << ".\n";
+        }
+    }
+}
+
+// Function to delete a specific node
+void deleteNode(int key) {
+    if (head == NULL) {
+        cout << "List is empty.\n";
+        return;
+    }
+
+    Node* temp = head;
+    Node* toDelete = NULL;
+
+    // Find the node to delete
+    do {
+        if (temp->data == key) {
+            toDelete = temp;
+            break;
+        }
+        temp = temp->next;
+    } while (temp != head);
+
+    if (toDelete == NULL) {
+        cout << "Node " << key << " not found.\n";
+        return;
+    }
+
+    // If only one node
+    if (toDelete->next == head && toDelete->prev == head) {
+        head = NULL;
+        delete toDelete;
+        cout << "Deleted the only node (" << key << ") from the list.\n";
+        return;
+    }
+
+    // Adjust pointers
+    Node* prevNode = toDelete->prev;
+    Node* nextNode = toDelete->next;
+    prevNode->next = nextNode;
+    nextNode->prev = prevNode;
+
+    // If deleting head, move head forward
+    if (toDelete == head)
+        head = nextNode;
+
+    delete toDelete;
+    cout << "Deleted node " << key << " successfully.\n";
+}
+
+// Function to search for a node
+void searchNode(int key) {
+    if (head == NULL) {
+        cout << "List is empty.\n";
+        return;
+    }
+
+    Node* temp = head;
+    int pos = 1;
+    bool found = false;
+
+    do {
+        if (temp->data == key) {
+            cout << "Node " << key << " found at position " << pos << ".\n";
+            found = true;
+            break;
+        }
+        temp = temp->next;
+        pos++;
+    } while (temp != head);
+
+    if (!found)
+        cout << "Node " << key << " not found in the list.\n";
+}
+
+// Main function with menu
+int main() {
+    int choice, value, refValue;
+
+    while (true) {
+        cout << "\n========== Circular Doubly Linked List ==========\n";
+        cout << "1. Insert a Node\n";
+        cout << "2. Delete a Node\n";
+        cout << "3. Search for a Node\n";
+        cout << "4. Display the List\n";
+        cout << "5. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                cout << "\nInsert Options:\n";
+                cout << "1. At Beginning\n";
+                cout << "2. At End\n";
+                cout << "3. Before/After a Specific Node\n";
+                cout << "Choose: ";
+                int posType;
+                cin >> posType;
+                cout << "Enter value to insert: ";
+                cin >> value;
+                if (posType == 3) {
+                    cout << "Enter reference value: ";
+                    cin >> refValue;
+                    insertNode(value, posType, refValue);
+                } else {
+                    insertNode(value, posType);
+                }
+                break;
+
+            case 2:
+                cout << "Enter node value to delete: ";
+                cin >> value;
+                deleteNode(value);
+                break;
+
+            case 3:
+                cout << "Enter node value to search: ";
+                cin >> value;
+                searchNode(value);
+                break;
+
+            case 4:
+                displayList();
+                break;
+
+            case 5:
+                cout << "Exiting program. Goodbye!\n";
+                return 0;
+
+            default:
+                cout << "Invalid choice. Try again.\n";
+        }
+    }
+}
