@@ -1,0 +1,205 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+/////////////////////////////////////
+// SIMPLE BFS (Unweighted Graph)
+/////////////////////////////////////
+void BFS(int start, vector<vector<int>>& adj) {
+    vector<int> visited(adj.size(), 0);
+    queue<int> q;
+
+    visited[start] = 1;
+    q.push(start);
+
+    cout << "BFS: ";
+    while(!q.empty()) {
+        int u = q.front(); q.pop();
+        cout << u << " ";
+
+        for(int v : adj[u]) {
+            if(!visited[v]) {
+                visited[v] = 1;
+                q.push(v);
+            }
+        }
+    }
+    cout << endl;
+}
+
+/////////////////////////////////////
+// SIMPLE DFS (Unweighted Graph)
+/////////////////////////////////////
+void DFSUtil(int u, vector<vector<int>>& adj, vector<int>& visited) {
+    visited[u] = 1;
+    cout << u << " ";
+
+    for(int v : adj[u])
+        if(!visited[v])
+            DFSUtil(v, adj, visited);
+}
+
+void DFS(int start, vector<vector<int>>& adj) {
+    vector<int> visited(adj.size(), 0);
+    cout << "DFS: ";
+    DFSUtil(start, adj, visited);
+    cout << endl;
+}
+
+/////////////////////////////////////
+// KRUSKAL MST
+/////////////////////////////////////
+class DSU {
+public:
+    vector<int> parent, rankv;
+
+    DSU(int n) {
+        parent.resize(n);
+        rankv.resize(n, 0);
+        for(int i = 0; i < n; i++) parent[i] = i;
+    }
+
+    int find(int x) {
+        if(parent[x] == x) return x;
+        return parent[x] = find(parent[x]);
+    }
+
+    void unite(int x, int y) {
+        x = find(x); y = find(y);
+        if(x != y) {
+            if(rankv[x] < rankv[y]) swap(x, y);
+            parent[y] = x;
+            if(rankv[x] == rankv[y]) rankv[x]++;
+        }
+    }
+};
+
+void Kruskal(int V, vector<tuple<int,int,int>>& edges) {
+    sort(edges.begin(), edges.end()); // sort by weight
+    DSU dsu(V);
+    int cost = 0;
+
+    cout << "Kruskal MST edges:\n";
+    for(auto &e : edges) {
+        int w, u, v;
+        tie(w, u, v) = e;
+
+        if(dsu.find(u) != dsu.find(v)) {
+            dsu.unite(u, v);
+            cost += w;
+            cout << u << " - " << v << " (Weight " << w << ")\n";
+        }
+    }
+    cout << "Total MST Cost = " << cost << endl;
+}
+
+/////////////////////////////////////
+// PRIM MST
+/////////////////////////////////////
+void Prim(int V, vector<vector<pair<int,int>>>& adj) {
+    vector<int> key(V, INT_MAX);
+    vector<int> inMST(V, 0);
+
+    priority_queue<pair<int,int>, vector<pair<int,int>>, greater<pair<int,int>>> pq;
+
+    key[0] = 0;
+    pq.push({0, 0});
+
+    cout << "Prim MST edges:\n";
+    int cost = 0;
+
+    while(!pq.empty()) {
+        int u = pq.top().second;
+        int wt = pq.top().first;
+        pq.pop();
+
+        if(inMST[u]) continue;
+        inMST[u] = 1;
+        cost += wt;
+
+        cout << "Take vertex " << u << " with weight " << wt << endl;
+
+        for(auto& p : adj[u]) {
+            int v = p.first, w = p.second;
+            if(!inMST[v] && w < key[v]) {
+                key[v] = w;
+                pq.push({key[v], v});
+            }
+        }
+    }
+    cout << "Total MST Cost = " << cost << endl;
+}
+
+/////////////////////////////////////
+// DIJKSTRA SHORTEST PATH
+/////////////////////////////////////
+void Dijkstra(int V, vector<vector<pair<int,int>>>& adj, int src) {
+    vector<int> dist(V, INT_MAX);
+    dist[src] = 0;
+
+    priority_queue<pair<int,int>, vector<pair<int,int>>, greater<pair<int,int>>> pq;
+    pq.push({0, src});
+
+    while(!pq.empty()) {
+        int u = pq.top().second;
+        pq.pop();
+
+        for(auto &p : adj[u]) {
+            int v = p.first;
+            int w = p.second;
+
+            if(dist[u] + w < dist[v]) {
+                dist[v] = dist[u] + w;
+                pq.push({dist[v], v});
+            }
+        }
+    }
+
+    cout << "Dijkstra Distances:\n";
+    for(int i = 0; i < V; i++)
+        cout << "Node " << i << " = " << dist[i] << endl;
+}
+
+/////////////////////////////////////
+// MAIN FUNCTION
+/////////////////////////////////////
+int main() {
+    int V = 5;
+
+    // For BFS & DFS
+    vector<vector<int>> adj_unweighted(V);
+    adj_unweighted[0] = {1, 2};
+    adj_unweighted[1] = {0, 3};
+    adj_unweighted[2] = {0, 4};
+    adj_unweighted[3] = {1};
+    adj_unweighted[4] = {2};
+
+    BFS(0, adj_unweighted);
+    DFS(0, adj_unweighted);
+
+    // For Weighted Graph (MST + Dijkstra)
+    vector<vector<pair<int,int>>> adj_weighted(V);
+    auto addEdge = [&](int u, int v, int w) {
+        adj_weighted[u].push_back({v, w});
+        adj_weighted[v].push_back({u, w});
+    };
+
+    addEdge(0,1,2);
+    addEdge(0,2,3);
+    addEdge(1,3,5);
+    addEdge(2,4,1);
+    addEdge(3,4,4);
+
+    // Kruskal edges
+    vector<tuple<int,int,int>> edges;
+    edges.push_back({2,0,1});
+    edges.push_back({3,0,2});
+    edges.push_back({5,1,3});
+    edges.push_back({1,2,4});
+    edges.push_back({4,3,4});
+
+    Kruskal(V, edges);
+    Prim(V, adj_weighted);
+    Dijkstra(V, adj_weighted, 0);
+
+    return 0;
+}
